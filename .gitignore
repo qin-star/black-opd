@@ -204,8 +204,7 @@ outputs/
 tensorboard/
 tensorboard_log/
 
-# verl submodule (managed separately)
-verl/
+# verl is managed as a git submodule
 
 # Deepscaler data
 deepscaler/hdfs_data/
