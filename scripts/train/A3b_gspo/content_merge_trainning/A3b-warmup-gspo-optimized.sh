@@ -33,13 +33,13 @@ kl_loss_type=low_var_kl
 clip_ratio_low=0.005      # 与 GAD 一致
 clip_ratio_high=0.01      # 与 GAD 一致
 
-actor_lr=1e-6             # 与 GAD 一致
+actor_lr=0.0              # 冻结 actor 参数更新
 actor_grad_clip=0.3       # 与 GAD 一致
-critic_lr=3e-6            # Warmup 阶段 critic 学习率稍高
-critic_grad_clip=0.2
+critic_lr=1e-5            # 优化：从 3e-6 提高到 1e-5，加速学习
+critic_grad_clip=1.0      # 优化：从 0.2 提高到 1.0，允许更大梯度
 gae_gamma=1.0
 gae_lam=0.95
-critic_warmup=20          # Warmup 阶段需要更多 critic 预热
+critic_warmup=999999      # 设置为极大值，整个训练过程不更新 actor
 
 # ===================================== Data/Model =====================================
 train_files=/home/jovyan/JQ/gad_gspo_B300/scripts/data_process/trainning_data/content_conflict_understanding_merged/merged_train_train.parquet
@@ -82,7 +82,7 @@ sleep 2
 
 # ===================================== Environment Variables =====================================
 export PYTHONPATH="/home/jovyan/JQ/gad_gspo_B300/verl:${PYTHONPATH}"
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export CUDA_VISIBLE_DEVICES=0,1,2,3  # 修改为实际可用的 GPU 数量
 export NCCL_TIMEOUT=36000
 export WANDB_INIT_TIMEOUT=600
 export TOKENIZERS_PARALLELISM=false
@@ -203,7 +203,7 @@ python3 -m verl.trainer.main_ppo \
     reward_model.enable=False \
     trainer.use_legacy_worker_impl=enable \
     trainer.critic_warmup=$critic_warmup \
-    trainer.warmup_use_sft=True \
+    trainer.warmup_use_sft=False \
     trainer.logger=['console','tensorboard'] \
     trainer.project_name=$project_name \
     trainer.experiment_name=$experiment_name \
